@@ -90,6 +90,9 @@ P.S. You can delete this when you're done too. It's your config now! :)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- Add Mason bin to PATH
+vim.env.PATH = vim.env.PATH .. ':' .. vim.fn.stdpath('data') .. '/mason/bin'
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
@@ -395,6 +398,7 @@ require('lazy').setup({
       -- See `:help telescope` and `:help telescope.setup()`
       require('telescope').setup {
         defaults = {
+          file_ignore_patterns = { '.git/' },
           vimgrep_arguments = {
             'rg',
             '--color=never',
@@ -446,12 +450,12 @@ require('lazy').setup({
 
           -- Jump to the implementation of the word under your cursor.
           -- Useful when your language has ways of declaring types without an actual implementation.
-          vim.keymap.set('n', 'gri', builtin.lsp_implementations, { buffer = buf, desc = '[G]oto [I]mplementation' })
+          vim.keymap.set('n', 'gi', builtin.lsp_implementations, { buffer = buf, desc = '[G]oto [I]mplementation' })
 
           -- Jump to the definition of the word under your cursor.
           -- This is where a variable was first declared, or where a function is defined, etc.
           -- To jump back, press <C-t>.
-          vim.keymap.set('n', 'grd', builtin.lsp_definitions, { buffer = buf, desc = '[G]oto [D]efinition' })
+          vim.keymap.set('n', 'gd', builtin.lsp_definitions, { buffer = buf, desc = '[G]oto [D]efinition' })
 
           -- Fuzzy find all the symbols in your current document.
           -- Symbols are things like variables, functions, types, etc.
@@ -626,19 +630,12 @@ local servers = {
       }
 
       -- Conditional TypeScript LSP: ts_ls (stable) or tsgo (experimental)
-      if vim.g.use_tsgo then
-        servers.tsgo = {
-          cmd = { 'tsgo', '--lsp' },
-          filetypes = { 'typescript', 'javascript', 'typescriptreact', 'javascriptreact' },
-          root_dir = function(bufnr)
-            local fname = vim.api.nvim_buf_get_name(bufnr)
-            if not fname or fname == '' then return nil end
-            return vim.fs.dirname(vim.fs.find({ 'tsconfig.json', 'jsconfig.json', 'package.json', '.git' }, { upward = true, path = fname })[1])
-          end,
-        }
-      else
-        servers.ts_ls = {}
-      end
+      servers.tsgo = {
+        cmd = { 'tsgo', '--lsp', '--stdio' },
+        filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+        root_markers = { 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lockb', 'bun.lock', '.git' },
+      }
+      servers.ts_ls = {}
 
       -- Ensure the servers and tools above are installed
       --
@@ -695,7 +692,8 @@ local servers = {
       vim.api.nvim_create_user_command('TSToggle', function()
         vim.g.use_tsgo = not vim.g.use_tsgo
         local current = vim.g.use_tsgo and 'tsgo (experimental)' or 'ts_ls (stable)'
-        vim.notify('TypeScript LSP set to: ' .. current .. '\nRestart Neovim for changes to take effect.', vim.log.levels.INFO)
+        vim.notify('Switched to: ' .. current .. '\nRestarting LSP...', vim.log.levels.INFO)
+        vim.cmd('edit')
       end, { desc = 'Toggle between ts_ls and tsgo LSP' })
     end,
   },
