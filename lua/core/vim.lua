@@ -71,6 +71,34 @@ local function set_autocmds()
             vim.hl.on_yank()
         end,
     })
+
+    -- Tmux status bar toggle
+    if vim.env.TMUX ~= nil then
+        local tmux_group = vim.api.nvim_create_augroup('tmux-status-toggle', { clear = true })
+
+        local function set_tmux_status(state)
+            vim.system({ 'tmux', 'set-option', '-g', 'status', state })
+        end
+
+        vim.api.nvim_create_autocmd({ 'VimEnter', 'FocusGained', 'VimResume' }, {
+            group = tmux_group,
+            callback = function() set_tmux_status('off') end,
+        })
+
+        vim.api.nvim_create_autocmd({ 'VimLeavePre', 'FocusLost', 'VimSuspend' }, {
+            group = tmux_group,
+            callback = function() set_tmux_status('on') end,
+        })
+
+        -- Manual toggle
+        vim.keymap.set('n', '<leader>ts', function()
+            vim.system({ 'tmux', 'show-options', '-gv', 'status' }, { text = true }, function(obj)
+                local current = obj.stdout:gsub("%s+", "")
+                local next_state = (current == 'on') and 'off' or 'on'
+                set_tmux_status(next_state)
+            end)
+        end, { desc = 'Toggle Tmux Status Bar' })
+    end
 end
 
 local function init()
