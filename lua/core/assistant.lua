@@ -10,7 +10,7 @@ local function init()
             },
             ignore_filetypes = { cpp = true },
             color = {
-                suggestion_color = "#ffffff",
+                suggestion_color = "#808080",
                 cterm = 244,
             },
             log_level = "info",
@@ -30,10 +30,10 @@ local function init()
 
         vim.keymap.set({ "n", "t" }, "<C-.>", function() opencode.toggle() end, { desc = "Toggle opencode" })
 
-        vim.keymap.set({ "n", "x" }, "go", function() return opencode.operator("@this ") end,
+        vim.keymap.set({ "n", "x" }, "<leader>a", function() return opencode.operator("@this ") end,
             { expr = true, desc = "Add range to opencode" })
 
-        vim.keymap.set("n", "goo", function() return opencode.operator("@this ") .. "_" end,
+        vim.keymap.set("n", "<leader>aa", function() return opencode.operator("@this ") .. "_" end,
             { expr = true, desc = "Add line to opencode" })
     end
 

@@ -9,9 +9,13 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- Add Mason bin to PATH
+vim.env.PATH = vim.env.PATH .. ':' .. vim.fn.stdpath('data') .. '/mason/bin'
+
 -- [[ Configure plugins ]]
 require('lazy').setup({
     -- UI & Theme
+    { 'rose-pine/neovim', name = 'rose-pine' },
     { 'folke/tokyonight.nvim', priority = 1000 },
     { 'nvim-lualine/lualine.nvim', dependencies = { 'nvim-tree/nvim-web-devicons' } },
     { 'rcarriga/nvim-notify' },

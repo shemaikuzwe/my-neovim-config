@@ -12,26 +12,20 @@ local function init()
     if status_markdown then markdown.setup() end
 
     -- Colorscheme
-    local status_tokyonight, tokyonight = pcall(require, 'tokyonight')
-    if status_tokyonight then
-        tokyonight.setup({
-            style = "night",
-            transparent = true,
+    local status_rose, rose_pine = pcall(require, 'rose-pine')
+    if status_rose then
+        rose_pine.setup({
+            variant = "moon", -- "main", "moon", or "dawn"
+            dark_variant = "moon",
+            dim_inactive_windows = false,
+            extend_background_behind_borders = true,
             styles = {
-                comments = { italic = false },
+                bold = true,
+                italic = false,
+                transparency = false,
             },
-            on_highlights = function(hl, c)
-                local prompt = "#2d3149"
-                hl.TelescopeNormal = { bg = c.bg_dark, fg = c.fg_dark }
-                hl.TelescopeBorder = { bg = c.bg_dark, fg = c.bg_dark }
-                hl.TelescopePromptNormal = { bg = prompt }
-                hl.TelescopePromptBorder = { bg = prompt, fg = prompt }
-                hl.TelescopePromptTitle = { bg = prompt, fg = prompt }
-                hl.TelescopePreviewTitle = { bg = c.bg_dark, fg = c.bg_dark }
-                hl.TelescopeResultsTitle = { bg = c.bg_dark, fg = c.bg_dark }
-            end,
         })
-        vim.cmd.colorscheme 'tokyonight-night'
+        vim.cmd.colorscheme 'rose-pine'
     end
 
     -- Lualine
@@ -39,11 +33,42 @@ local function init()
     if status_lualine then
         lualine.setup({
             options = {
-                theme = 'tokyonight',
-                component_separators = '|',
-                section_separators = '',
-                extensions = { "fzf", "quickfix" },
+                theme = 'rose-pine',
+                component_separators = '',
+                section_separators = { left = '', right = '' },
+                disabled_filetypes = {
+                    statusline = {},
+                    winbar = {},
+                },
+                ignore_focus = {},
+                always_divide_middle = true,
+                globalstatus = true,
+                refresh = {
+                    statusline = 1000,
+                    tabline = 1000,
+                    winbar = 1000,
+                }
             },
+            sections = {
+                lualine_a = { { 'mode', separator = { left = '' }, right_padding = 2 } },
+                lualine_b = { 'filename', 'branch' },
+                lualine_c = { 'diff', 'diagnostics' },
+                lualine_x = { 'encoding', 'fileformat', 'filetype' },
+                lualine_y = { 'progress' },
+                lualine_z = { { 'location', separator = { right = '' }, left_padding = 2 } },
+            },
+            inactive_sections = {
+                lualine_a = {},
+                lualine_b = {},
+                lualine_c = { 'filename' },
+                lualine_x = { 'location' },
+                lualine_y = {},
+                lualine_z = {},
+            },
+            tabline = {},
+            winbar = {},
+            inactive_winbar = {},
+            extensions = { "fzf", "neo-tree", "lazy" },
         })
     end
 
