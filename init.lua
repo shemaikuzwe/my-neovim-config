@@ -17,6 +17,8 @@ require('lazy').setup({
     -- UI & Theme
     { 'rose-pine/neovim', name = 'rose-pine' },
     { 'folke/tokyonight.nvim', priority = 1000 },
+    { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
+    { "rebelot/kanagawa.nvim", priority = 1000 },
     { 'nvim-lualine/lualine.nvim', dependencies = { 'nvim-tree/nvim-web-devicons' } },
     { 'rcarriga/nvim-notify' },
     { 'folke/noice.nvim', dependencies = { 'MunifTanjim/nui.nvim', 'rcarriga/nvim-notify' } },

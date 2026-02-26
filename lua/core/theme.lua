@@ -12,20 +12,25 @@ local function init()
     if status_markdown then markdown.setup() end
 
     -- Colorscheme
-    local status_rose, rose_pine = pcall(require, 'rose-pine')
-    if status_rose then
-        rose_pine.setup({
-            variant = "moon", -- "main", "moon", or "dawn"
-            dark_variant = "moon",
-            dim_inactive_windows = false,
-            extend_background_behind_borders = true,
-            styles = {
-                bold = true,
-                italic = false,
-                transparency = false,
+    local status_catppuccin, catppuccin = pcall(require, 'catppuccin')
+    if status_catppuccin then
+        catppuccin.setup({
+            flavour = "macchiato", -- latte, frappe, macchiato, mocha
+            transparent_background = false,
+            term_colors = true,
+            integrations = {
+                cmp = true,
+                gitsigns = true,
+                nvimtree = true,
+                treesitter = true,
+                notify = true,
+                mini = {
+                    enabled = true,
+                    indentscope_color = "",
+                },
             },
         })
-        vim.cmd.colorscheme 'rose-pine'
+        vim.cmd.colorscheme 'catppuccin-macchiato'
     end
 
     -- Lualine
@@ -33,7 +38,7 @@ local function init()
     if status_lualine then
         lualine.setup({
             options = {
-                theme = 'rose-pine',
+                theme = 'catppuccin',
                 component_separators = '',
                 section_separators = { left = '', right = '' },
                 disabled_filetypes = {

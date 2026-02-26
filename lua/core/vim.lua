@@ -13,6 +13,7 @@ end
 local function set_vim_o()
     local settings = {
         number = true,
+        relativenumber = true,
         mouse = 'a',
         showmode = false,
         breakindent = true,

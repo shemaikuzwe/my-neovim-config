@@ -27,6 +27,8 @@ local function init()
                 'typescript-language-server',
                 'tailwindcss-language-server',
                 'yaml-language-server',
+                'oxlint',
+                'biome',
             }
         })
     end
@@ -151,6 +153,10 @@ local function init()
             },
             formatters_by_ft = {
                 lua = { 'stylua' },
+                javascript = { 'biome' },
+                typescript = { 'biome' },
+                javascriptreact = { 'biome' },
+                typescriptreact = { 'biome' },
             },
         })
     end
