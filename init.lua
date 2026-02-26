@@ -34,9 +34,9 @@ require('lazy').setup({
         'nvim-neo-tree/neo-tree.nvim',
         branch = 'v3.x',
         dependencies = {
-            'nvim-lua/plenary.nvim',
             'nvim-tree/nvim-web-devicons',
             'MunifTanjim/nui.nvim',
+            'nvim-lua/plenary.nvim',
         },
     },
 
@@ -52,7 +52,25 @@ require('lazy').setup({
     },
     { 'saghen/blink.cmp', version = 'v0.*' },
     { 'stevearc/conform.nvim' },
-    { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
+    { 
+        'nvim-treesitter/nvim-treesitter', 
+        lazy = false,
+        priority = 1000,
+        build = ':TSUpdate',
+        config = function()
+            require('nvim-treesitter').setup({
+                ensure_installed = { 
+                    'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 
+                    'query', 'vim', 'vimdoc', 'go', 'rust', 'typescript', 'javascript', 
+                    'yaml', 'json', 'dockerfile', 'dotenv' 
+                },
+                sync_install = true,
+                auto_install = true,
+                highlight = { enable = true },
+                indent = { enable = true },
+            })
+        end
+    },
 
     -- AI Tools
     { 'supermaven-inc/supermaven-nvim' },

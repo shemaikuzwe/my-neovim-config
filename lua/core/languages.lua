@@ -1,14 +1,18 @@
 local function init()
-    -- Treesitter
-    local status_ts, ts_configs = pcall(require, 'nvim-treesitter.configs')
-    if status_ts then
-        ts_configs.setup({
-            ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'go', 'rust', 'typescript', 'javascript' },
-            auto_install = true,
-            highlight = { enable = true },
-            indent = { enable = true },
-        })
-    end
+    -- Treesitter handled in init.lua for proper loading
+
+    -- Map filetypes for .env and yaml
+    vim.filetype.add({
+        extension = {
+            env = 'dotenv',
+        },
+        filename = {
+            ['.env'] = 'dotenv',
+        },
+        pattern = {
+            ['.env.*'] = 'dotenv',
+        },
+    })
 
     -- Mason & LSP
     local status_mason, mason = pcall(require, 'mason')
@@ -22,6 +26,7 @@ local function init()
                 'rust-analyzer',
                 'typescript-language-server',
                 'tailwindcss-language-server',
+                'yaml-language-server',
             }
         })
     end
@@ -77,6 +82,7 @@ local function init()
         },
         rust_analyzer = {},
         tailwindcss = {},
+        yamlls = {},
     }
 
     if vim.g.use_tsgo then
@@ -111,6 +117,7 @@ local function init()
                 'rust_analyzer',
                 'ts_ls',
                 'tailwindcss',
+                'yamlls',
             },
         })
     end

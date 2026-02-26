@@ -52,6 +52,21 @@ local function set_vim_opt()
 end
 
 local function set_autocmds()
+    -- Map filetypes explicitly
+    vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+        pattern = { '*.yaml', '*.yml' },
+        callback = function()
+            vim.bo.filetype = 'yaml'
+        end,
+    })
+
+    vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+        pattern = { '.env', '.env.*' },
+        callback = function()
+            vim.bo.filetype = 'dotenv'
+        end,
+    })
+
     -- Auto-save on inactivity
     vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
         pattern = '*',
@@ -106,6 +121,10 @@ local function init()
     set_vim_o()
     set_vim_opt()
     set_autocmds()
+
+    -- Ensure syntax highlighting is active
+    vim.cmd('syntax on')
+    vim.cmd('filetype plugin indent on')
 end
 
 return {
