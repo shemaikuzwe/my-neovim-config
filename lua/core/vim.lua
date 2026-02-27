@@ -3,7 +3,7 @@ local function set_vim_g()
     vim.g.maplocalleader = " "
     vim.g.have_nerd_font = true
     -- TypeScript LSP toggle: false = ts_ls (default), true = tsgo (experimental)
-    vim.g.use_tsgo = true
+    vim.g.use_tsgo = false
 
     -- Disable netrw (built-in file explorer)
     vim.g.loaded_netrw = 1

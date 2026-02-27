@@ -7,6 +7,7 @@ local function init()
     require('core.floaterm').init()
     require('core.assistant').init()
     require('core.explorer').init()
+    require('core.bufferline').init()
 end
 
 return {

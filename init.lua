@@ -20,6 +20,8 @@ require('lazy').setup({
     { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
     { "rebelot/kanagawa.nvim", priority = 1000 },
     { 'nvim-lualine/lualine.nvim', dependencies = { 'nvim-tree/nvim-web-devicons' } },
+    { 'akinsho/bufferline.nvim', version = "*", dependencies = 'nvim-tree/nvim-web-devicons' },
+    { 'moll/vim-bbye' },
     { 'rcarriga/nvim-notify' },
     { 'folke/noice.nvim', dependencies = { 'MunifTanjim/nui.nvim', 'rcarriga/nvim-notify' } },
     { 'folke/which-key.nvim', event = 'VimEnter', opts = {} },

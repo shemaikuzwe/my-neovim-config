@@ -1,6 +1,25 @@
 local function init()
     -- Treesitter handled in init.lua for proper loading
 
+    -- Diagnostic configuration
+    vim.diagnostic.config({
+        float = { 
+            border = 'rounded',
+            source = 'always', -- Show which LSP sent the diagnostic
+        },
+        signs = true,
+        underline = true,
+        update_in_insert = false,
+        severity_sort = true,
+    })
+
+    -- Diagnostic symbols
+    local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
+    for type, icon in pairs(signs) do
+        local hl = "DiagnosticSign" .. type
+        vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+    end
+
     -- Map filetypes for .env and yaml
     vim.filetype.add({
         extension = {
@@ -27,7 +46,6 @@ local function init()
                 'typescript-language-server',
                 'tailwindcss-language-server',
                 'yaml-language-server',
-                'oxlint',
                 'biome',
             }
         })
@@ -69,8 +87,16 @@ local function init()
         end
     end
 
+    -- Server list
     local servers = {
         lua_ls = {},
+        biome = {
+            root_dir = function(fname)
+                return vim.fs.root(fname, { 'biome.json', 'biome.jsonc', 'package.json', 'tsconfig.json', '.git' })
+            end,
+            workspace_required = false,
+            single_file_support = true,
+        },
         gopls = {
             settings = {
                 gopls = {
@@ -87,7 +113,16 @@ local function init()
         yamlls = {},
     }
 
+    -- Standard on_attach that disables formatting
+    local no_format_attach = function(client, bufnr)
+        client.server_capabilities.documentFormattingProvider = false
+        client.server_capabilities.documentRangeFormattingProvider = false
+        on_attach(client, bufnr)
+    end
+
+    -- Selection logic for TS servers
     if vim.g.use_tsgo then
+        -- Define custom tsgo config if not already defined
         local tsgo_config = {
             default_config = {
                 cmd = { vim.fn.stdpath('data') .. '/mason/bin/tsgo', '--lsp', '--stdio' },
@@ -97,17 +132,13 @@ local function init()
                 end,
             }
         }
-        if vim.lsp.config then
-            vim.lsp.config('tsgo', tsgo_config)
-        else
-            local status_lc, lspconfig = pcall(require, 'lspconfig')
-            if status_lc and not lspconfig.configs.tsgo then
-                lspconfig.configs.tsgo = tsgo_config
-            end
+        local status_lc, lspconfig = pcall(require, 'lspconfig')
+        if status_lc and not lspconfig.configs.tsgo then
+            lspconfig.configs.tsgo = tsgo_config
         end
-        servers.tsgo = {}
+        servers.tsgo = { on_attach = no_format_attach }
     else
-        servers.ts_ls = {}
+        servers.ts_ls = { on_attach = no_format_attach }
     end
 
     local status_mason_lsp, mason_lsp = pcall(require, 'mason-lspconfig')
@@ -115,6 +146,7 @@ local function init()
         mason_lsp.setup({
             ensure_installed = {
                 'lua_ls',
+                'biome',
                 'gopls',
                 'rust_analyzer',
                 'ts_ls',
@@ -124,17 +156,17 @@ local function init()
         })
     end
 
-    -- Setup all servers
+    -- Setup all servers using modern Neovim 0.11+ API if available
     for server_name, server in pairs(servers) do
         server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-        server.on_attach = on_attach
+        if not server.on_attach then
+            server.on_attach = on_attach
+        end
         
         if vim.lsp.config then
-            -- Neovim 0.11+ way: use vim.lsp.config and vim.lsp.enable
             vim.lsp.config(server_name, server)
             vim.lsp.enable(server_name)
         else
-            -- Legacy way for older Neovim versions
             local status_lc, lspconfig = pcall(require, 'lspconfig')
             if status_lc and lspconfig[server_name] then
                 lspconfig[server_name].setup(server)
@@ -146,17 +178,19 @@ local function init()
     local status_conform, conform = pcall(require, 'conform')
     if status_conform then
         conform.setup({
-            notify_on_error = false,
+            notify_on_error = true,
             format_on_save = {
-                timeout_ms = 500,
+                timeout_ms = 2000,
                 lsp_format = 'fallback',
             },
             formatters_by_ft = {
                 lua = { 'stylua' },
-                javascript = { 'biome' },
-                typescript = { 'biome' },
-                javascriptreact = { 'biome' },
-                typescriptreact = { 'biome' },
+                javascript = { 'biome', stop_after_first = true },
+                typescript = { 'biome', stop_after_first = true },
+                javascriptreact = { 'biome', stop_after_first = true },
+                typescriptreact = { 'biome', stop_after_first = true },
+                json = { 'biome', stop_after_first = true },
+                jsonc = { 'biome', stop_after_first = true },
             },
         })
     end

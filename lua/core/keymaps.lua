@@ -48,6 +48,9 @@ local function init()
     end, { desc = 'Scroll up floating window' })
 
     -- Diagnostic keymaps
+    vim.keymap.set('n', '[d', function() vim.diagnostic.goto_prev({ float = true }) end, { desc = 'Go to previous [D]iagnostic' })
+    vim.keymap.set('n', ']d', function() vim.diagnostic.goto_next({ float = true }) end, { desc = 'Go to next [D]iagnostic' })
+    vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror message' })
     vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
     -- Exit terminal mode
@@ -67,6 +70,11 @@ local function init()
 
     -- Explorer
     vim.keymap.set('n', '\\', '<CMD>Neotree toggle<CR>', { desc = 'Toggle Explorer' })
+
+    -- Buffer Navigation
+    vim.keymap.set('n', '<S-l>', '<CMD>BufferLineCycleNext<CR>', { desc = 'Next Buffer' })
+    vim.keymap.set('n', '<S-h>', '<CMD>BufferLineCyclePrev<CR>', { desc = 'Previous Buffer' })
+    vim.keymap.set('n', '<leader>x', '<CMD>Bdelete<CR>', { desc = 'Close Buffer' })
 
     -- Commenting (Ctrl + /)
     -- Most terminals send <C-/> as <C-_>
