@@ -1,5 +1,60 @@
 -- [[ Bootstrap lazy.nvim ]]
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
+
+-- Treesitter Safety Guard (Essential for Neovim 0.12-dev)
+-- This prevents the "Parser could not be created" crash by verifying parser existence
+local origin_ts_start = vim.treesitter.start
+local origin_ts_get_parser = vim.treesitter.get_parser
+local origin_ts_get_string_parser = vim.treesitter.get_string_parser
+
+-- Add system-level parsers to runtimepath if they exist (common in Ubuntu/Debian)
+local system_parser_path = "/usr/lib/x86_64-linux-gnu/nvim"
+if vim.fn.isdirectory(system_parser_path) == 1 then
+    vim.opt.rtp:append(system_parser_path)
+end
+
+-- Robust check to see if a parser is actually available
+local function has_parser(lang)
+    if not lang or lang == "" then return false end
+    local p_lang = lang == "help" and "vimdoc" or lang
+    return pcall(vim.treesitter.language.inspect, p_lang)
+end
+
+vim.treesitter.get_parser = function(bufnr, lang, opts)
+    lang = lang or (bufnr and vim.bo[bufnr].filetype) or vim.bo.filetype
+    local p_lang = lang == "help" and "vimdoc" or lang
+    if has_parser(p_lang) then
+        return origin_ts_get_parser(bufnr, p_lang, opts)
+    end
+    return nil, "Parser not found for " .. tostring(p_lang)
+end
+
+vim.treesitter.get_string_parser = function(str, lang, opts)
+    local p_lang = lang == "help" and "vimdoc" or lang
+    if has_parser(p_lang) then
+        return origin_ts_get_string_parser(str, p_lang, opts)
+    end
+    return nil, "Parser not found for " .. tostring(p_lang)
+end
+
+vim.treesitter.start = function(bufnr, lang)
+    lang = lang or (bufnr and vim.bo[bufnr].filetype) or vim.bo.filetype
+    local p_lang = lang == "help" and "vimdoc" or lang
+    if has_parser(p_lang) then
+        return origin_ts_start(bufnr, p_lang)
+    end
+end
+
+-- Disable Treesitter highlighting for filetypes without parsers
+vim.api.nvim_create_autocmd("FileType", {
+    callback = function(args)
+        local lang = vim.bo[args.buf].filetype
+        if lang and not has_parser(lang) then
+            pcall(vim.treesitter.stop, args.buf)
+        end
+    end,
+})
+
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
     local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
     local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
@@ -11,6 +66,9 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Add Mason bin to PATH
 vim.env.PATH = vim.env.PATH .. ':' .. vim.fn.stdpath('data') .. '/mason/bin'
+
+-- Add Treesitter parsers to runtimepath (essential for development versions of Neovim)
+vim.opt.runtimepath:append(vim.fn.stdpath('data') .. '/lazy/nvim-treesitter/parser')
 
 -- [[ Configure plugins ]]
 require('lazy').setup({
@@ -66,9 +124,9 @@ require('lazy').setup({
                 ensure_installed = { 
                     'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 
                     'query', 'vim', 'vimdoc', 'go', 'rust', 'typescript', 'javascript', 
-                    'yaml', 'json', 'dockerfile', 'dotenv' 
+                    'yaml', 'json', 'dockerfile' 
                 },
-                sync_install = true,
+                sync_install = false,
                 auto_install = true,
                 highlight = { enable = true },
                 indent = { enable = true },

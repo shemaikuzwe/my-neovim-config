@@ -53,26 +53,19 @@ local function set_vim_opt()
 end
 
 local function set_autocmds()
-    -- Map filetypes explicitly
-    vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
-        pattern = { '*.yaml', '*.yml' },
-        callback = function()
-            vim.bo.filetype = 'yaml'
-        end,
-    })
-
+    -- Map filetypes explicitly for .env
     vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
         pattern = { '.env', '.env.*' },
         callback = function()
-            vim.bo.filetype = 'dotenv'
+            vim.bo.filetype = 'bash'
         end,
     })
 
-    -- Auto-save on inactivity
+    -- Auto-save on inactivity (only for normal buffers)
     vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
         pattern = '*',
         callback = function()
-            if vim.bo.modified then
+            if vim.bo.modified and vim.bo.buftype == "" then
                 vim.cmd('silent! update')
             end
         end,
@@ -122,10 +115,6 @@ local function init()
     set_vim_o()
     set_vim_opt()
     set_autocmds()
-
-    -- Ensure syntax highlighting is active
-    vim.cmd('syntax on')
-    vim.cmd('filetype plugin indent on')
 end
 
 return {

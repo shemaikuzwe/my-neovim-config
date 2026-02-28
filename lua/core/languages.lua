@@ -23,13 +23,15 @@ local function init()
     -- Map filetypes for .env and yaml
     vim.filetype.add({
         extension = {
-            env = 'dotenv',
+            env = 'bash',
+            yaml = 'yaml',
+            yml = 'yaml',
         },
         filename = {
-            ['.env'] = 'dotenv',
+            ['.env'] = 'bash',
         },
         pattern = {
-            ['.env.*'] = 'dotenv',
+            ['.env.*'] = 'bash',
         },
     })
 
@@ -113,13 +115,6 @@ local function init()
         yamlls = {},
     }
 
-    -- Standard on_attach that disables formatting
-    local no_format_attach = function(client, bufnr)
-        client.server_capabilities.documentFormattingProvider = false
-        client.server_capabilities.documentRangeFormattingProvider = false
-        on_attach(client, bufnr)
-    end
-
     -- Selection logic for TS servers
     if vim.g.use_tsgo then
         -- Define custom tsgo config if not already defined
@@ -136,9 +131,9 @@ local function init()
         if status_lc and not lspconfig.configs.tsgo then
             lspconfig.configs.tsgo = tsgo_config
         end
-        servers.tsgo = { on_attach = no_format_attach }
+        servers.tsgo = { on_attach = on_attach }
     else
-        servers.ts_ls = { on_attach = no_format_attach }
+        servers.ts_ls = { on_attach = on_attach }
     end
 
     local status_mason_lsp, mason_lsp = pcall(require, 'mason-lspconfig')
@@ -185,12 +180,12 @@ local function init()
             },
             formatters_by_ft = {
                 lua = { 'stylua' },
-                javascript = { 'biome', stop_after_first = true },
-                typescript = { 'biome', stop_after_first = true },
-                javascriptreact = { 'biome', stop_after_first = true },
-                typescriptreact = { 'biome', stop_after_first = true },
-                json = { 'biome', stop_after_first = true },
-                jsonc = { 'biome', stop_after_first = true },
+                javascript = { 'biome', 'lsp', stop_after_first = true },
+                typescript = { 'biome', 'lsp', stop_after_first = true },
+                javascriptreact = { 'biome', 'lsp', stop_after_first = true },
+                typescriptreact = { 'biome', 'lsp', stop_after_first = true },
+                json = { 'biome', 'lsp', stop_after_first = true },
+                jsonc = { 'biome', 'lsp', stop_after_first = true },
             },
         })
     end

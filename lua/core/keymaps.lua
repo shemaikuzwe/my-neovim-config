@@ -75,6 +75,8 @@ local function init()
     vim.keymap.set('n', '<S-l>', '<CMD>BufferLineCycleNext<CR>', { desc = 'Next Buffer' })
     vim.keymap.set('n', '<S-h>', '<CMD>BufferLineCyclePrev<CR>', { desc = 'Previous Buffer' })
     vim.keymap.set('n', '<leader>x', '<CMD>Bdelete<CR>', { desc = 'Close Buffer' })
+    vim.keymap.set('n', '<leader>bo', '<CMD>BufferLineCloseOthers<CR>', { desc = 'Close Other Buffers' })
+    vim.keymap.set('n', '<leader>ba', '<CMD>bufdo Bdelete<CR>', { desc = 'Close All Buffers' })
 
     -- Commenting (Ctrl + /)
     -- Most terminals send <C-/> as <C-_>
