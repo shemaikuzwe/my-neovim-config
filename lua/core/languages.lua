@@ -26,6 +26,7 @@ local function init()
             env = 'bash',
             yaml = 'yaml',
             yml = 'yaml',
+            prisma = 'prisma',
         },
         filename = {
             ['.env'] = 'bash',
@@ -49,6 +50,7 @@ local function init()
                 'tailwindcss-language-server',
                 'yaml-language-server',
                 'biome',
+                'prisma-language-server',
             }
         })
     end
@@ -113,6 +115,7 @@ local function init()
         rust_analyzer = {},
         tailwindcss = {},
         yamlls = {},
+        prismals = {},
     }
 
     -- Selection logic for TS servers
@@ -147,6 +150,7 @@ local function init()
                 'ts_ls',
                 'tailwindcss',
                 'yamlls',
+                'prismals',
             },
         })
     end
