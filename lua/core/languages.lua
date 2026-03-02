@@ -118,26 +118,8 @@ local function init()
         prismals = {},
     }
 
-    -- Selection logic for TS servers
-    if vim.g.use_tsgo then
-        -- Define custom tsgo config if not already defined
-        local tsgo_config = {
-            default_config = {
-                cmd = { vim.fn.stdpath('data') .. '/mason/bin/tsgo', '--lsp', '--stdio' },
-                filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
-                root_dir = function(fname)
-                    return vim.fs.root(fname, { 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml', 'bun.lockb', 'bun.lock', 'package.json', 'tsconfig.json', '.git' })
-                end,
-            }
-        }
-        local status_lc, lspconfig = pcall(require, 'lspconfig')
-        if status_lc and not lspconfig.configs.tsgo then
-            lspconfig.configs.tsgo = tsgo_config
-        end
-        servers.tsgo = { on_attach = on_attach }
-    else
-        servers.ts_ls = { on_attach = on_attach }
-    end
+    -- TypeScript server setup
+    servers.ts_ls = { on_attach = on_attach }
 
     local status_mason_lsp, mason_lsp = pcall(require, 'mason-lspconfig')
     if status_mason_lsp then
@@ -193,26 +175,6 @@ local function init()
             },
         })
     end
-
-    -- TSToggle command
-    vim.api.nvim_create_user_command('TSToggle', function()
-        vim.g.use_tsgo = not vim.g.use_tsgo
-        local current = vim.g.use_tsgo and 'tsgo (experimental)' or 'ts_ls (stable)'
-        local to_stop = vim.g.use_tsgo and 'ts_ls' or 'tsgo'
-
-        -- Stop the previous server
-        local clients = vim.lsp.get_clients({ name = to_stop })
-        for _, client in ipairs(clients) do
-            client.stop()
-        end
-
-        vim.notify('Switched to: ' .. current .. '\nRestarting LSP...', vim.log.levels.INFO)
-
-        -- Schedule restart to ensure old server is gone
-        vim.defer_fn(function()
-            vim.cmd('edit')
-        end, 100)
-    end, { desc = 'Toggle between ts_ls and tsgo LSP' })
 end
 
 return {

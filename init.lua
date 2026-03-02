@@ -86,7 +86,6 @@ require('lazy').setup({
 
     -- AI Tools
     { 'supermaven-inc/supermaven-nvim' },
-    { 'nickjvandyke/opencode.nvim', dependencies = { 'nvim-lua/plenary.nvim', 'MunifTanjim/nui.nvim' } },
 
     -- Git
     { 'lewis6991/gitsigns.nvim', opts = {} },
