@@ -50,6 +50,8 @@ local function init()
                 'tailwindcss-language-server',
                 'yaml-language-server',
                 'biome',
+                'prettier',
+                'oxfmt',
                 'prisma-language-server',
             }
         })
@@ -161,17 +163,33 @@ local function init()
         conform.setup({
             notify_on_error = true,
             format_on_save = {
-                timeout_ms = 2000,
+                timeout_ms = 5000,
                 lsp_format = 'fallback',
             },
             formatters_by_ft = {
                 lua = { 'stylua' },
-                javascript = { 'biome', 'lsp', stop_after_first = true },
-                typescript = { 'biome', 'lsp', stop_after_first = true },
-                javascriptreact = { 'biome', 'lsp', stop_after_first = true },
-                typescriptreact = { 'biome', 'lsp', stop_after_first = true },
-                json = { 'biome', 'lsp', stop_after_first = true },
-                jsonc = { 'biome', 'lsp', stop_after_first = true },
+                javascript = { 'prettier', 'biome', 'oxfmt', stop_after_first = true },
+                typescript = { 'prettier', 'biome', 'oxfmt', stop_after_first = true },
+                javascriptreact = { 'prettier', 'biome', 'oxfmt', stop_after_first = true },
+                typescriptreact = { 'prettier', 'biome', 'oxfmt', stop_after_first = true },
+                json = { 'prettier', 'biome', 'oxfmt', stop_after_first = true },
+                jsonc = { 'prettier', 'biome', 'oxfmt', stop_after_first = true },
+            },
+            formatters = {
+                prettier = {
+                    condition = function(_, ctx)
+                        return vim.fs.root(ctx.filename, {
+                            ".prettierrc", ".prettierrc.json", ".prettierrc.yml", ".prettierrc.yaml", ".prettierrc.json5",
+                            ".prettierrc.js", "prettier.config.js", ".prettierrc.ts", "prettier.config.ts",
+                            ".prettierrc.mjs", "prettier.config.mjs", ".prettierrc.mts", "prettier.config.mts"
+                        })
+                    end,
+                },
+                biome = {
+                    condition = function(_, ctx)
+                        return vim.fs.root(ctx.filename, { "biome.json", "biome.jsonc" })
+                    end,
+                },
             },
         })
     end

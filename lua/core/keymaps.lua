@@ -62,12 +62,6 @@ local function init()
     vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
     vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
-    -- Window navigation (AltF4 alternatives)
-    vim.keymap.set('n', '<leader>h', '<CMD>wincmd h<CR>', options)
-    vim.keymap.set('n', '<leader>j', '<CMD>wincmd j<CR>', options)
-    vim.keymap.set('n', '<leader>k', '<CMD>wincmd k<CR>', options)
-    vim.keymap.set('n', '<leader>l', '<CMD>wincmd l<CR>', options)
-
     -- Explorer
     vim.keymap.set('n', '\\', '<CMD>Neotree toggle<CR>', { desc = 'Toggle Explorer' })
 

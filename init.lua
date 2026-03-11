@@ -32,7 +32,17 @@ require('lazy').setup({
     { 'moll/vim-bbye' },
     { 'rcarriga/nvim-notify' },
     { 'folke/noice.nvim', dependencies = { 'MunifTanjim/nui.nvim', 'rcarriga/nvim-notify' } },
-    { 'folke/which-key.nvim', event = 'VimEnter', opts = {} },
+    {
+        'folke/which-key.nvim',
+        event = 'VimEnter',
+        config = function()
+            local wk = require('which-key')
+            wk.setup({})
+            wk.add({
+                { "<leader>h", group = "Git" },
+            })
+        end
+    },
     { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
     { 'MeanderingProgrammer/render-markdown.nvim', opts = {} },
     { 'norcalli/nvim-colorizer.lua' },
@@ -88,7 +98,40 @@ require('lazy').setup({
     { 'supermaven-inc/supermaven-nvim' },
 
     -- Git
-    { 'lewis6991/gitsigns.nvim', opts = {} },
+    {
+        'lewis6991/gitsigns.nvim',
+        opts = {
+            on_attach = function(bufnr)
+                local gitsigns = require('gitsigns')
+                local function map(mode, l, r, opts)
+                    opts = opts or {}
+                    opts.buffer = bufnr
+                    vim.keymap.set(mode, l, r, opts)
+                end
+
+                -- Navigation
+                map('n', ']c', function()
+                    if vim.wo.diff then return ']c' end
+                    vim.schedule(function() gitsigns.next_hunk() end)
+                    return '<Ignore>'
+                end, { expr = true, desc = 'Next hunk' })
+
+                map('n', '[c', function()
+                    if vim.wo.diff then return '[c' end
+                    vim.schedule(function() gitsigns.prev_hunk() end)
+                    return '<Ignore>'
+                end, { expr = true, desc = 'Prev hunk' })
+
+                -- Actions
+                map('n', '<leader>hs', gitsigns.stage_hunk, { desc = 'git stage hunk' })
+                map('n', '<leader>hr', gitsigns.reset_hunk, { desc = 'git reset hunk' })
+                map('v', '<leader>hs', function() gitsigns.stage_hunk { vim.fn.line('.'), vim.fn.line('v') } end, { desc = 'stage hunk' })
+                map('v', '<leader>hr', function() gitsigns.reset_hunk { vim.fn.line('.'), vim.fn.line('v') } end, { desc = 'reset hunk' })
+                map('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'preview hunk' })
+                map('n', '<leader>hb', function() gitsigns.blame_line { full = true } end, { desc = 'blame line' })
+            end,
+        },
+    },
 
     -- Utils
     { 'NMAC427/guess-indent.nvim', opts = {} },
